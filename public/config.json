@@ -1,0 +1,8 @@
+{
+  "host": "http://www.holywiser.com",
+  "tempLoginPwd": "123456",
+  "realApiUrl": "https://www.holywiser.com/api2",
+  "enableConsole": true,
+  "mc": false,
+  "code": true
+}

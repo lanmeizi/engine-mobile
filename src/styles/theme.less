@@ -1,0 +1,122 @@
+/*
+    1.主色调，整体项目的主要颜色。 @background
+    2.搜索框的背景颜色。 @searchbg
+    3.字体颜色。主要是和主色调来配合使用。@fontcolor
+    4.logo登录 申请试用 底部导航的背景颜色。  @topTabbg
+    5.提示信息的背景颜色。  @noticebg
+    6.切换版本按钮的颜色
+*/
+// 控制样式的函数 907456 715641
+.bg(@start :#907456,@end :#715641){
+  background:-webkit-gradient(linear, 0 0, 0 100%, from(@start), to(@end));
+  background:-moz-linear-gradient(top, @start, @end);
+}
+.theme(@background:#715641 , @searchbg: #F7F7F7, @fontcolor: #d1a678, @topTabbg: #1B1B1D, @noticebg: #E5DCD3, @changeBtn: #D1A679) {
+  // 登录导航的颜色
+  .loginBox {
+    background: @topTabbg;
+    color: @changeBtn;
+  }
+  // 弹框按钮的颜色
+  .van-button--info {
+    color: #fff;
+    .bg(#907456,#715641);
+    border: 0.02667rem solid @background;
+  }
+  // 切换版本按钮的颜色
+  .van-button--warning {
+    background-color: @changeBtn;
+    border: 0.02667rem solid @changeBtn;
+    color: #333;
+  }
+  // 弹框顶部标题的颜色
+  .van-divider {
+    border-color: @background !important;
+    color: @background !important;
+    font-weight: bold;
+  }
+  // tab导航栏的颜色
+  .van-tab--active {
+    color: @background !important;
+  }
+  .van-tabs__line {
+    .bg(#907456,#715641);
+  }
+  // 搜索框时间的背景颜色
+  #search .timeBox {
+    background-color: @searchbg !important;
+  }
+  // 底部导航的颜色
+  .van-tabbar {
+    background-color: @topTabbg;
+    .van-tabbar-item {
+      color: @fontcolor;
+    }
+  }
+  // 提示信息的背景颜色
+  .van-notice-bar {
+    background-color: @noticebg !important;
+  }
+  // 导航返回箭头的颜色
+  .van-icon-arrow-left::before {
+    color: @background;
+  }
+  // 下拉菜单选中的颜色
+  .van-dropdown-menu__title {
+    color: @background;
+  }
+  .van-dropdown-menu__title {
+    color: @background;
+  }
+  .van-dropdown-menu__item--disabled .van-dropdown-menu__title {
+    color: #ccc
+  }
+  .van-dropdown-item__option--active {
+    color: @background;
+    .van-dropdown-item__icon {
+      color: @background;
+    }
+  }
+  // 搜索框搜索图标的颜色
+  .van-icon-search::before {
+    // color: @background;
+  }
+  .van-search__content--round { // 搜索框的样式
+    border: 1px solid @background;
+    border-radius: 18px 0 0 18px !important;
+  }
+  .van-search__action { // 搜索按钮的样式
+    padding: 0 12px 0 0 !important;
+  }
+  .searchBtnStyle { // 搜索按钮的背景颜色
+    .bg(#907456,#715641);
+  }
+  .titleStyleAll {
+    color: @background;
+  }
+  .van-pagination__item {
+    color: @background;
+  }
+  .van-pagination__item:active {
+    background-color: #fff;
+  }
+  .van-radio__icon--checked .van-icon {
+    .bg(#907456,#715641);
+    border-color: @background;
+  }
+  .van-checkbox__icon--checked .van-icon {
+    .bg(#907456,#715641);
+    border-color: @background;
+  }
+  // 法规层级
+  .van-sidebar-item--select::before {
+    background-color: @background;
+    height: 0.36rem;
+    position: absolute;
+    top: 48%;
+    left: 0;
+  }
+  .van-tree-select__item--active {
+    color: @background;
+  }
+}
