@@ -12,8 +12,8 @@ export default {
   },
   created() {
     // let data2 = TripleDES.decode('token', JSON.parse(this.$cookie.get('cookieObj')))
-    // console.log('获取前data2data2data2', data2)
-
+    // console.log('获取前data2data2data2', document.URL)
+   
     // 执行临时登录
     if (sessionStorage.userId === undefined && this.$cookie.get('cookieObj') === null) {
       templogin()
@@ -32,6 +32,6 @@ body,
 #app {
   width: 100%;
   height: 100%;
-  background: #fff;
+  // background: #fff;
 }
 </style>

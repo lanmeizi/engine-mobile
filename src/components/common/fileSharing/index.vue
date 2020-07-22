@@ -189,14 +189,22 @@ export default {
         cutwords: []
       }
       this.$http.reqPostDocDetail(bodyJson).then( response => {
-        console.log('response====>详情数据', response)
-        this.handleLoadDoc(response)
+        console.log('response111111111111111111111111111111====>详情数据', response)
+        if (response.rtncode === 1) {
+          if (response.rltcode === 1) {
+            this.handleLoadDoc(response)
+          } else {
+            this.$notify({ color: '#fff', background: '#b99573', message: response.rltdesc })
+            this.showLoding = false
+            this.showDetailPopup = false
+          }
+        } else {
+          this.showLoding = false
+          this.showDetailPopup = false
+        }
       }).catch(() => {
-        // this.$toast.fail(err.message)
         sessionStorage.clear()
         this.$cookie.delete('cookieObj')
-        // this.$toast.fail(err.message)
-        // console.log('err66669999', err)
         this.showDetailPopup = false
       })
     },
@@ -210,7 +218,6 @@ export default {
       }
       this.$http.reqPostDocDetail(bodyJson).then( response => {
         console.log('response====>详情数据666666', response)
-        // this.handleLoadDoc(response)
         if (response.rtncode === 1) {
           if (response.rltcode === 1) {
             this.handleLoadDoc(response)
@@ -226,7 +233,6 @@ export default {
           this.showLoding = false
         }
       }).catch(() => {
-        // this.$toast.fail(err.message)
         this.showDetailPopup = false
       })
     },

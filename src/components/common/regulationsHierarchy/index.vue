@@ -1,7 +1,7 @@
 <template>
 <!-- 法规层级弹框组件 -->
   <div id="regulationsHierarchy">
-    <van-popup v-model="showNav" closeable close-icon="close" position="left" :style="{ height: '100%', width: '80%' }">
+    <van-popup v-model="showNav" closeable close-icon="close" position="left" :style="{ height: '100%', width: '82%' }">
       <div class="selectNav">
         <van-divider :style="{ color: '#1989fa', borderColor: '#1989fa', fontSize: '17px', marginTop: '20px' }">
           法规层级

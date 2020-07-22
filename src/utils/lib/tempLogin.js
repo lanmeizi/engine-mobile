@@ -3,6 +3,7 @@ import * as $http from '@/api/common'
 import VueCookie from 'vue-cookie'
 // 临时登录
 export default function templogin() {
+  // console.log('执行临时等111', VueCookie.get('cookieObj'))
   $http.reqTempLogin().then(resp => {
     if (resp.rtncode === 1) {
       if (resp.rltcode === 1) {
@@ -16,7 +17,12 @@ export default function templogin() {
           store.commit('user/setIsLogin', true)
           store.commit('user/setUserType', resp.usertype)
           store.commit('user/setPermission', resp.permission)
+
+          sessionStorage.setItem('userguid', resp.userguid)
+          sessionStorage.setItem('token', resp.token)
         }
+
+        console.log('临时登录6666666666666666666666688888888889999==》store.state.user', store.state.user)
 
         reqGetLocation() // 获取定位
         reqGetIndustry() // 行业

@@ -514,7 +514,7 @@ export default {
 
     // 点击列表查看详情
     wordDetail(doc) {
-      console.log('点击列表数据的内容88', doc)
+      // console.log('点击列表数据的内容', doc)
       this.loginDoc  = doc
       // this.backDocFiresArr.push(doc.docid)
       this.lastFlag = true
@@ -529,13 +529,12 @@ export default {
     },
     // 获取最新文件列表
     getDetail(doc) {
-      console.log('doc===>', doc)
+      // console.log('doc', doc, this.$store.state.user)
       this.showLoding = true
       let bodyJson = {
         docid: parseInt(doc.docid),
         h1hit: doc.h1hit,
         chit: doc.chit,
-        chitseq: doc.chitseq ? doc.chitseq : 0,
         cutwords: []
       }
       this.$http.reqPostDocDetail(bodyJson).then( response => {
@@ -543,18 +542,14 @@ export default {
         if (response.rtncode === 1) {
           if (response.rltcode === 1) {
             this.handleLoadDoc(response)
-          } else {
-            this.$notify({ color: '#fff', background: '#b99573', message: response.rltdesc })
-            this.showLoding = false
-            this.showDetailPopup = false
           }
-        } else {
-          this.showLoding = false
-          this.showDetailPopup = false
         }
+        // this.handleLoadDoc(response)
       }).catch( () => {
         sessionStorage.clear()
         this.$cookie.delete('cookieObj')
+        // this.$toast.fail(err.message)
+        // console.log('err66669999', err)
         this.showDetailPopup = false
       })
     },
@@ -564,7 +559,6 @@ export default {
         docid: parseInt(docid),
         h1hit: [],
         chit: [],
-        // chitseq: [],
         cutwords: []
       }
       this.$http.reqPostDocDetail(bodyJson).then( response => {
@@ -584,6 +578,7 @@ export default {
           this.showLoding = false
         }
       }).catch( () => {
+        // this.$toast.fail(err.message)
         this.showDetailPopup = false
       })
     },
@@ -620,6 +615,7 @@ export default {
             } else {
               this.lastFlag = true
             }
+            // console.log('111111临时登录this.backDocFiresArr=======', this.backDocFiresArr)
           }
           
           this.showLoding = false
@@ -630,10 +626,12 @@ export default {
             this.showLoginBtn = true
           }
         } else {
+          // this.$toast.fail(response.rltdesc)
           this.$notify({ color: '#fff', background: '#b99573', message: response.rltdesc })
           this.showLoding = false
         }
       } else {
+        // this.$toast.fail(response.rtndesc)
         this.$notify({ color: '#fff', background: '#b99573', message: response.rtndesc })
         this.showLoding = false
       }

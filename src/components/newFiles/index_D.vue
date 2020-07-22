@@ -51,27 +51,47 @@
     <!-- 分页 -->
     <!-- 全国 -->
     <div v-if="globalFlag && globalLists.length > 0" class="pageBoxStyle">
-      <van-pagination v-model="currentPage" :page-count="total" mode="simple" @change="changePage" />
+      <Pagination 
+        :currentPage="currentPage" 
+        :total="total" 
+        :totalLists="totalLists" 
+        @prevPage="prevPage" 
+        @nextPage="nextPage"
+        @jumpToPageSize="jumpToPageSize"
+      ></Pagination>
     </div>
     <!-- 省份 -->
     <div v-if="provinceFlag && provinceLists.length > 0" class="pageBoxStyle">
-      <van-pagination v-model="currentPage1" :page-count="total1" mode="simple" @change="changePage1" />
+      <Pagination 
+        :currentPage="currentPage1" 
+        :total="total1" 
+        :totalLists="totalLists1" 
+        @prevPage="prevPage1" 
+        @nextPage="nextPage1"
+        @jumpToPageSize="jumpToPageSize1"
+      ></Pagination>
     </div>
     <!-- 城市 -->
     <div v-if="cityFlag && cityLists.length > 0" class="pageBoxStyle">
-      <van-pagination v-model="currentPage2" :page-count="total2" mode="simple" @change="changePage2" />
+      <Pagination 
+        :currentPage="currentPage2" 
+        :total="total2" 
+        :totalLists="totalLists2" 
+        @prevPage="prevPage2" 
+        @nextPage="nextPage2"
+        @jumpToPageSize="jumpToPageSize2"
+      ></Pagination>
     </div>
     
     <!-- 底部导航 -->
-    <tabbar ref="tabbar" @alertBars="alertBars" @alertCengji="alertCengji" @updateOrDelete="updateOrDelete" @chooseUpdateOrDelete="chooseUpdateOrDelete" :selectedID="selectedId"></tabbar>
-
+    <tabbar ref="tabbar" 
+      @alertBars="alertBars" 
+      @alertCengji="alertCengji" 
+      @updateOrDelete="updateOrDelete"
+      @chooseUpdateOrDelete="chooseUpdateOrDelete" 
+      :selectedID="selectedId"
+    ></tabbar>
     <van-overlay :showLoding="showLoding"></van-overlay>
-    <!-- <van-overlay :show="showLoding" @click="showLoding = false" z-index="9999" :custom-style="{background: 'transparent'}">
-      <div class="wrapper" @click.stop>
-        <van-loading type="spinner" color="#1989fa">文件加载中...</van-loading>
-      </div>
-    </van-overlay> -->
-
   </div>
 </template>
 
@@ -85,6 +105,7 @@ import UploadFile from '@/components/common/uploadFile' // 一键上传
 import ListContent from '@/components/common/listContent'
 import VanOverlay from '@/components/common/vanOverlay'
 import Vue from 'vue'
+import Pagination from '@/components/common/pagination' // 分页
 export default {
   data() {
     return {
@@ -136,7 +157,8 @@ export default {
     RegulationsHierarchy,
     UploadFile,
     ListContent,
-    VanOverlay
+    VanOverlay,
+    Pagination
   },
   computed: {
     userId() {
@@ -450,6 +472,84 @@ export default {
         let dom = document.getElementById('goToHere')
         dom.scrollIntoView()
       })
+      this.getData(this.tagid, this.stime, this.etime, this.searchText)
+    },
+    prevPage() {  // 全国上一页
+      if (this.currentPage == 1) return
+      this.currentPage1 = 1
+      this.currentPage2 = 1
+      this.currentPage--
+      this.$nextTick(() => {
+        let dom = document.getElementById('goToHere')
+        dom.scrollIntoView()
+      })
+      this.getData(this.tagid, this.stime, this.etime, this.searchText)
+    },
+    nextPage() {  // 下一页
+      if (this.currentPage == this.total)return
+      this.currentPage1 = 1
+      this.currentPage2 = 1
+      this.currentPage++
+      this.$nextTick(() => {
+        let dom = document.getElementById('goToHere')
+        dom.scrollIntoView()
+      })
+      this.getData(this.tagid, this.stime, this.etime, this.searchText)
+    },
+    jumpToPageSize(num) {  // 跳转到多少页
+      this.currentPage = num
+      this.getData(this.tagid, this.stime, this.etime, this.searchText)
+    },
+    prevPage1() {  // 省份上一页
+      if (this.currentPage1 == 1) return
+      this.currentPage = 1
+      this.currentPage2 = 1
+      this.currentPage1--
+      this.$nextTick(() => {
+        let dom = document.getElementById('goToHere')
+        dom.scrollIntoView()
+      })
+      this.getData(this.tagid, this.stime, this.etime, this.searchText)
+    },
+    nextPage1() {  // 下一页
+      if (this.currentPage1 == this.total1)return
+      this.currentPage = 1
+      this.currentPage2 = 1
+      this.currentPage1++
+      this.$nextTick(() => {
+        let dom = document.getElementById('goToHere')
+        dom.scrollIntoView()
+      })
+      this.getData(this.tagid, this.stime, this.etime, this.searchText)
+    },
+    jumpToPageSize1(num) {  // 跳转到多少页
+      this.currentPage1 = num
+      this.getData(this.tagid, this.stime, this.etime, this.searchText)
+    },
+    prevPage2() {  // 城市上一页
+      if (this.currentPage2 == 1) return
+      this.currentPage = 1
+      this.currentPage1 = 1
+      this.currentPage2--
+      this.$nextTick(() => {
+        let dom = document.getElementById('goToHere')
+        dom.scrollIntoView()
+      })
+      this.getData(this.tagid, this.stime, this.etime, this.searchText)
+    },
+    nextPage2() {  // 下一页
+      if (this.currentPage2 == this.total2)return
+      this.currentPage = 1
+      this.currentPage1 = 1
+      this.currentPage2++
+      this.$nextTick(() => {
+        let dom = document.getElementById('goToHere')
+        dom.scrollIntoView()
+      })
+      this.getData(this.tagid, this.stime, this.etime, this.searchText)
+    },
+    jumpToPageSize2(num) {  // 跳转到多少页
+      this.currentPage2 = num
       this.getData(this.tagid, this.stime, this.etime, this.searchText)
     },
     showGetData(data) {

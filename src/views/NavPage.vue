@@ -12,8 +12,8 @@
       </van-tab>
       <van-tab title="智慧云端" name="c"><Smartcloud ref="smartcloud"></Smartcloud></van-tab>
       <van-tab title="特别声明" name="g"><important-clause></important-clause></van-tab>
-      <!-- <van-tab title="网上商城" name="d"><OnlineMall></OnlineMall></van-tab>
-      <van-tab title="操作手册" name="e" disabled><Usermanual></Usermanual></van-tab>
+      <van-tab title="网上商城" name="d"><OnlineMall></OnlineMall></van-tab>
+      <!-- <van-tab title="操作手册" name="e" disabled><Usermanual></Usermanual></van-tab>
       <van-tab title="演示视频" name="f" disabled><Video></Video></van-tab> -->
     </van-tabs>
     <login ref="alertModel"></login>
@@ -34,9 +34,7 @@ import ImportantClause from '@/components/importantClause'
 
 export default {
   data() {
-    return {
-      // activeName: this.$store.state.commonSearchData.activeName
-    }
+    return {}
   },
   components: {
     Login,

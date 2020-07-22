@@ -23,7 +23,8 @@
         <!-- <p @click="themeDefault">默认</p>
         <p @click="themeGreen">green</p> -->
         <!-- <p @click="themLink">333</p> -->
-        <van-popup v-model="show1" position="top" :style="{ height: '40%' }" get-container="body">
+        <van-popup v-model="show1" position="top" get-container="body">
+        <!-- <van-popup v-model="show1" position="top" :style="{ height: '40%' }" get-container="body"> -->
           <van-divider :style="{ color: '#1989fa', borderColor: '#1989fa', fontSize: '17px', marginTop: '40px' }">
             版本切换
           </van-divider>
@@ -41,6 +42,7 @@
               </van-cell>
             </van-cell-group>
           </van-radio-group>
+          <div style="margin-top: 40px;"></div>
         </van-popup>
       </div>
     </div>
@@ -49,11 +51,33 @@
     <login ref="alertModel"></login>
 
     <van-popup v-model="showAccMsg" position="bottom" :style="{ height: '32%'}" get-container="body">
-      <van-divider :style="{ fontSize: '17px', marginTop: '40px' }">
+      <van-divider :style="{ fontSize: '18px', marginTop: '40px' }">
         账号信息
       </van-divider>
       <div class="acc" style="line-height: 40px; margin: 0 30px; font-size: 18px;">账号：{{ userId }}</div>
       <div class="acc" style="line-height: 40px; margin: 0 30px; font-size: 18px;">手机：{{ phone }}</div>
+    </van-popup>
+
+    <!-- 意见反馈弹框 -->
+    <van-popup v-model="feedBack" closeable position="bottom" :style="{ height: '100%'}" get-container="body">
+      <van-divider :style="{ fontSize: '18px', marginTop: '40px' }">
+        意见反馈
+      </van-divider>
+      <div class="feed-back-box">
+        <div style="border: 1px solid #f5f6f7; height: 100%;">
+          <van-field
+            v-model="feedBackMessage"
+            rows="18"
+            autosize
+            type="textarea"
+            placeholder="请输入意见/反馈内容"
+          />
+        </div>
+      </div>
+      <div class="btn-buju">
+        <van-button style="width: 30%;border-radius: 30px;height: 40px;" type="default" @click="clocsFeed">取消</van-button>
+        <van-button style="width: 30%;border-radius: 30px;height: 40px;" type="info" @click="confirmFeedBack">确定</van-button>
+      </div>
     </van-popup>
   </div>
 </template>
@@ -67,18 +91,20 @@ export default {
       actions: [
         { name: '账号信息' },
         { name: '修改密码' },
+        // { name: '意见反馈' },
         { name: '注销账号', color: '#ed4014'},
       ],
       showAccMsg: false,
+      feedBack: false, // 意见反馈
       changeFlag: true, // 切换版本
       radio: '1',
-      radioWord: '全国版'
+      radioWord: '全国版',
+      feedBackMessage: '' // 反馈内容
     }
   },
   components: {
     Login
   },
-  mounted() {},
   computed: {
     userId() {
       return this.$store.state.user.userId
@@ -88,6 +114,35 @@ export default {
     }
   },
   methods: {
+    // 关闭意见反馈弹框
+    clocsFeed() {
+      this.feedBack = false
+      this.feedBackMessage = ''
+    },
+    // 点击意见反馈弹框里的确定按钮
+    confirmFeedBack() {
+      if (this.feedBackMessage) {
+        let params = {
+          suggestions: this.feedBackMessage
+        }
+        this.$http.reqCreateFeedBack(params).then(res => {
+          if (res.rtncode === 1) {
+            if (res.rltcode === 1) {
+              this.$notify({ color: '#fff', background: '#b99573', message: '意见反馈成功' })
+              this.feedBack = false
+            } else {
+              this.feedBack = false
+            }
+          } else {
+            this.feedBack = false
+          }
+        }).catch(() => {
+          this.feedBack = false
+        })
+      } else {
+        this.$notify({ color: '#fff', background: '#b99573', message: '请输入意见/反馈内容' })
+      }
+    },
     // 切换版本
     changeVersion(value) {
       // console.log('value切换版本====>', value)
@@ -125,6 +180,8 @@ export default {
       this.show = false
       if (item.name === '账号信息') {
         this.showAccMsg = true
+      } else if (item.name === '意见反馈') {
+        this.feedBack = true
       } else if (item.name === '修改密码') {
         this.$refs.alertModel.changeResetPassword(true)
       } else if (item.name === '注销账号') {
@@ -170,7 +227,7 @@ export default {
     themeGreen() {
       document.body.className = 'theme_darkgreen';
       localStorage.setItem('themeColor', 'theme_darkgreen')
-    },
+    }
     // 暖色
     // themLink() {
     //   document.body.className = 'thenm_warm';
@@ -227,6 +284,21 @@ export default {
     line-height: 40px;
     margin: 0 30px;
     font-size: 14px;
+  }
+}
+</style>
+<style lang="less">
+.feed-back-box {
+  padding:  0 20px 20px;
+  height: 70%;
+}
+.btn-buju {
+  display: flex;
+  justify-content: space-between;
+  &:before,
+  &:after {
+    content: '';
+    display: block;
   }
 }
 </style>

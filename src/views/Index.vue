@@ -134,6 +134,9 @@ export default {
               this.$store.commit('user/setIsLogin', true)
               this.$store.commit('user/setUserType', resp.usertype)
               this.$store.commit('user/setPermission', resp.permission)
+
+              sessionStorage.setItem('userguid', resp.userguid)
+              sessionStorage.setItem('token', resp.token)
             }
           }
         }
@@ -186,8 +189,8 @@ export default {
     },
     // 登录按钮
     login () {
-      let token = this.$store.state.user.token
-      console.log('登录按钮===token', token)
+      // let token = this.$store.state.user.token
+      // console.log('登录按钮===token', token)
 
       if (this.clickNum === 0) {
         this.$store.commit('commonSearchData/changeActiveName', 'a')

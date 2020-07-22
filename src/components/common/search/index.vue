@@ -47,8 +47,6 @@
       @search="onSearch"
     >
       <template #action>
-        <!-- <van-button type="info" size="small" @click="onSearch">搜索</van-button> -->
-        <!-- <van-button type="info" size="small" style="width:100px;height:0.98rem;border-radius:0 18px 18px 0;font-size:16px;margin-left:-1rem;" @click="onSearch">搜索</van-button> -->
         <div class="searchBtnStyle" @click="onSearch">搜索</div>
       </template>
     </van-search>

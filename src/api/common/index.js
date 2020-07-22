@@ -121,6 +121,14 @@ export const refreshToken = (nodes) => {
   return HttpPost('/api/public/security/user/refreshtoken', bodyJson, nodes)
 }
 
+//意见和建议(意见反馈)
+export const reqCreateFeedBack = (args) => {
+  var bodyJson = {
+    suggestions: args.suggestions
+  }
+  return HttpPost('/api/public/suggestions/suggestions/add', bodyJson)
+}
+
 // 综合检索
 export const reqGetGeneralFiles = (args, nodes) => HttpPost('/api/public/search/engine/general', args, nodes)
 
@@ -249,37 +257,45 @@ export const reqRemoveFilesByList = (folderid, list) => {
   return HttpPost('/api/public/cloud/upload/remove', bodyJson)
 }
 
+//删除云端指定文件夹下的全文废止(失效)文件
+export const reqRemoveAbolitionFilesByFolderId = (folderid) => {
+  var bodyJson = {
+      dirid: folderid,
+  }
+  return HttpPost('/api/public/cloud/upload/removeabolition', bodyJson)
+}
+
 // 一键上传-最新文件
 export const reqOneKeyLastFiles = (args) => HttpPost('/api/public/cloud/upload/onekey_v2/new', args)
 
-// 一键上传-综合搜索-----------------------------------
+// 一键上传-综合搜索
 export const reqOneKeyGeneralFiles_V2 = (args) => HttpPost('/api/public/cloud/upload/onekey_v2/general', args)
 
-// 一键上传-进出口-------------------------------------
+// 一键上传-进出口
 export const reqOneKeyInoutFiles_V2 = (args) => HttpPost('/api/public/cloud/upload/onekey_v2/inout', args)
 
-// 一键上传-行业-通用----------------------------------
+// 一键上传-行业-通用
 export const reqOneKeyIndustryCommonFiles_V2 = (args) => HttpPost('/api/public/cloud/upload/onekey_v2/industrycommon', args)
 
-// 一键上传-行业-专属----------------------------------
+// 一键上传-行业-专属
 export const reqOneKeyIndustrySpecialFiles_V2 = (args) => HttpPost('/api/public/cloud/upload/onekey_v2/industry', args)
 
-// 一键上传-条约-通用----------------------------------
+// 一键上传-条约-通用
 export const reqOneKeyTreatyCommonFiles_V2 = (args) => HttpPost('/api/public/cloud/upload/onekey_v2/treatycommon', args)
 
-// 一键上传-条约-专属----------------------------------
+// 一键上传-条约-专属
 export const reqOneKeyTreatySpecialFiles_V2 = (args) => HttpPost('/api/public/cloud/upload/onekey_v2/treaty', args)
 
-// 一键上传-税收优惠项目-----------------------------------
+// 一键上传-税收优惠项目
 export const reqOneKeyTaxBreakFiles_item_V2 = (args) => HttpPost('/api/public/cloud/upload/onekey_v2/reduction_item', args)
 
-// 一键上传-税收优惠税种-----------------------------------
+// 一键上传-税收优惠税种
 export const reqOneKeyTaxBreakFiles_taxes_V2 = (args) => HttpPost('/api/public/cloud/upload/onekey_v2/reduction_taxes', args)
 
-// 一键上传-税收优惠行业通用-----------------------------------
+// 一键上传-税收优惠行业通用
 export const reqOneKeyTaxBreakFiles_common_V2 = (args) => HttpPost('/api/public/cloud/upload/onekey_v2/reduction_industrycommon', args)
 
-// 一键上传-税收优惠行业专属-----------------------------------
+// 一键上传-税收优惠行业专属
 export const reqOneKeyTaxBreakFiles_special_V2 = (args) => HttpPost('/api/public/cloud/upload/onekey_v2/reduction_industry', args)
 
 // 请求地方版默认数据

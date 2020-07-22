@@ -42,6 +42,8 @@
                   v-model="regMoblie"
                   center
                   clearable
+                  type="number"
+                  maxlength="11"
                   placeholder="请输入11位手机号码"
                   @blur="checkMobile"
                   :error-message="errMsg.mobilePhone"
@@ -50,6 +52,8 @@
                   v-model="regCode"
                   center
                   clearable
+                  type="number"
+                  maxlength="6"
                   placeholder="请输入短信验证码"
                   @blur="changeCode"
                   :error-message="errMsg.code"
@@ -82,6 +86,8 @@
               v-model="regMoblie"
               center
               clearable
+              type="number"
+              maxlength="11"
               placeholder="请输入11位手机号码"
               @blur="checkMobile"
               :error-message="errMsg.mobilePhone"
@@ -90,6 +96,8 @@
               v-model="regCode"
               center
               clearable
+              type="number"
+              maxlength="6"
               placeholder="请输入短信验证码"
               @blur="changeCode"
               :error-message="errMsg.code"
@@ -138,11 +146,6 @@
               :error-message="errMsg.confirmPwd"
             />
           </van-cell-group>
-          <!-- <div class="tip" style="margin-top: 20px;">
-            <van-notice-bar wrapable :scrollable="false">
-              特别提示：注册成功后，请及时关注微信公众号"众智云擎"，点击"云擎中心"按钮进入"变动提醒"绑定账号，即时获取云端文件效力变动信息。
-            </van-notice-bar>
-          </div> -->
           <div v-if="setOwx === 'wx'" class="tip" style="margin-top: 20px;">
             <van-notice-bar wrapable :scrollable="false">
               特别提示：注册成功后，请点击"云擎中心"按钮进入"变动提醒"绑定账号，即时获取云端文件效力变动信息。
@@ -169,6 +172,8 @@
               v-model="regMoblie"
               center
               clearable
+              type="number"
+              maxlength="11"
               placeholder="请输入11位手机号码"
               @blur="checkMobile"
               :error-message="errMsg.mobilePhone"
@@ -177,6 +182,8 @@
               v-model="regCode"
               center
               clearable
+              type="number"
+              maxlength="6"
               placeholder="请输入短信验证码"
               @blur="changeCode"
               :error-message="errMsg.code"
@@ -233,7 +240,6 @@ import TripleDES from '@/utils/lib/crypto.js'
 export default {
   data() {
     return {
-      userGuid: '',
       codeType: 0,
 
       showLogin: false, // 登录弹框
@@ -269,10 +275,10 @@ export default {
   computed: {
     setOwx() {
       return this.$store.state.user.Owx
+    },
+    userGuid() {
+      return this.$store.state.user.userGuid
     }
-  },
-  mounted() {
-    this.userGuid = this.$store.state.user.userGuid
   },
   methods: {
     // 验证手机号码
@@ -574,6 +580,8 @@ export default {
         this.checkPassword()
         this.checkConfirmPwd()
         this.showReg = true
+      } else if(this.errMsg.password !== '' || this.errMsg.confirmPwd !== '') {
+        this.showReg = true
       } else {
         let bodyJson = {
           mobilenum: this.regMoblie,
@@ -589,6 +597,16 @@ export default {
             if (response.rltcode === 1) {
               this.$notify({ color: '#fff', background: '#b99573', message: '注册成功, 请登录' })
               this.showReg = false
+
+              // 注册成功之后 文件夹创建默认目录
+              this.$http.reqCreateDefault().then(res => {
+                if (res.rltcode === 1) {
+                  if (res.rltcode === 1) {
+                    this.getFixedFolder()
+                  }
+                }
+              })
+
             } else {
               this.$notify(response.rltdesc)
               this.showReg = true

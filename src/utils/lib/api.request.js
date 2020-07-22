@@ -35,7 +35,6 @@ ajax.interceptors.response.use(resp => { // 响应拦截
     } else if (resp.data.rtncode === -99 || resp.data.rltcode === -99) {
         clearData()
     } if (resp.data.rtncode === -50 && resp.data.rltcode === -1) { // 签名错误
-        console.log('签名错误', store.state.user.token)
         clearData()
     } else if (resp.data.rtncode === -98 || resp.data.rltcode === -98) {
         clearData()
@@ -80,6 +79,9 @@ function templogin() {
             store.commit('user/setIsLogin', true)
             store.commit('user/setUserType', resp.usertype)
             store.commit('user/setPermission', resp.permission)
+
+            sessionStorage.setItem('userguid', resp.userguid)
+            sessionStorage.setItem('token', resp.token)
           }
         }
       }
@@ -140,7 +142,7 @@ function HttpGet(url, params) {
 }
 
 function HttpPost(url, bodyJson, nodes) {
-    console.log('HttpPost', url)
+    console.log('HttpPost', url, bodyJson)
     var randomStr = randomWord(true, 10, 16)
     var timestamp = getTimeStamp()
     var token = store.state.user.token
@@ -170,8 +172,8 @@ function HttpPost(url, bodyJson, nodes) {
         resolveWithFullResponse: true,
         json: true // Automatically stringifies the body to JSON
     }
-    console.log('post data:')
-    console.log(options)
+    // console.log('post data:')
+    // console.log(options)
     return new Promise((resolve, reject) => {
         ajax({
                 url: url,

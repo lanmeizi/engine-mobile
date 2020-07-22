@@ -83,6 +83,12 @@
             <img :src="props.active && flag3 ? icon5.active : icon5.inactive" />
           </template>
         </van-tabbar-item>
+        <!-- <van-tabbar-item>
+          <span>删除废止</span>
+          <template #icon="props">
+            <img :src="props.active ? icon4.active : icon4.inactive" />
+          </template>
+        </van-tabbar-item> -->
       </van-tabbar>
     </div>
   </div>
@@ -162,6 +168,10 @@ export default {
         this.active = -1
         this.$emit('chooseUpdateOrDelete')
       }
+      // else if (active === 4) {
+      //   this.active = -1
+      //   this.$emit('deleteAbolish')
+      // }
     }
   }
 }

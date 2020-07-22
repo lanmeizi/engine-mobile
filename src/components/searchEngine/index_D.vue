@@ -165,28 +165,22 @@
 
     <!-- 分页 -->
     <div v-if="lists.length > 0" class="pageBoxStyle">
-      <van-pagination v-model="currentPage" :page-count="total" mode="simple" @change="changePage" />
+      <Pagination :currentPage="currentPage" :total="total" :totalLists="totalLists" @prevPage="prevPage" @nextPage="nextPage" @jumpToPageSize="jumpToPageSize"></Pagination>
     </div>
     <div v-if="lists4.length > 0" class="pageBoxStyle">
-      <van-pagination v-model="currentPage5" :page-count="total5" mode="simple" @change="changePage5" />
+      <Pagination :currentPage="currentPage5" :total="total5" :totalLists="totalLists" @prevPage="prevPage5" @nextPage="nextPage5" @jumpToPageSize="jumpToPageSize5"></Pagination>
     </div>
     <div v-if="commonFlag && commonLists.length > 0" class="pageBoxStyle">
-      <van-pagination v-model="currentCommonPage" :page-count="commonTotal5" mode="simple" @change="changePage5" />
+      <Pagination :currentPage="currentCommonPage" :total="commonTotal5" :totalLists="commonTotal5Lists" @prevPage="prevPage5" @nextPage="nextPage5" @jumpToPageSize="jumpToPageSize5"></Pagination>
     </div>
     <div v-if="industryFlag && industryLists.length > 0" class="pageBoxStyle">
-      <van-pagination v-model="currentIndustryPage" :page-count="industryTotal5" mode="simple" @change="changePage5" />
+      <Pagination :currentPage="currentIndustryPage" :total="industryTotal5" :totalLists="industryTotal5lists" @prevPage="prevPage5" @nextPage="nextPage5" @jumpToPageSize="jumpToPageSize5"></Pagination>
     </div>
 
     <!-- 底部导航 -->
     <tabbar ref="tabbar" @alertBars="alertBars" @alertCengji="alertCengji" @updateOrDelete="updateOrDelete" @chooseUpdateOrDelete="chooseUpdateOrDelete" :selectedID="selectedId"></tabbar>
 
     <van-overlay :showLoding="showLoding"></van-overlay>
-    <!-- <van-overlay :show="showLoding" @click="showLoding = false" z-index="9999" :custom-style="{background: 'transparent'}">
-      <div class="wrapper" @click.stop>
-        <van-loading type="spinner" color="#1989fa">文件加载中...</van-loading>
-      </div>
-    </van-overlay> -->
-
   </div>
 </template> 
 
@@ -199,6 +193,8 @@ import RegulationsHierarchy from '@/components/common/regulationsHierarchy' // �
 import UploadFile from '@/components/common/uploadFile' // 一键上传
 import ListContent from '@/components/common/listContent'
 import VanOverlay from '@/components/common/vanOverlay'
+
+import Pagination from '@/components/common/pagination' // 分页
 
 export default {
   data() {
@@ -344,7 +340,8 @@ export default {
     RegulationsHierarchy,
     UploadFile,
     ListContent,
-    VanOverlay
+    VanOverlay,
+    Pagination
   },
   computed: {
     userId() {
@@ -1434,7 +1431,7 @@ export default {
                       fixedTagid = item3.id
                     } else if (item3.children && item3.children.length === 1 && item3.children[0].children) {
                       item3.children.forEach(item4 => {
-                        // console.log('66666666666666666', item4)
+                        console.log(item4)
                       })
                     } else {
                       fixedTagid = item3.children[0].id
@@ -1663,12 +1660,6 @@ export default {
     // 点击一键上传
     updateOrDelete() {
       console.log('点击了地方版的一键上传this.tagpc6666==>', this.tagpc)
-      // console.log('点击了地方版一键上传6868999', this.updateDatas)
-      // console.log('this.updateDatas', this.updateDatas.fliter.tagpc)
-
-      // this.updateDatas.fliter.tagpc = this.tagpc
-      // http://192.168.8.31:20201
-
       if (this.userId) {
         if (this.queryBtn === 0) {
           this.$notify({ color: '#fff', background: '#b99573', message: '请先搜索文件后上传' })
@@ -1706,36 +1697,6 @@ export default {
       } else {
         this.$notify({ color: '#fff', background: '#b99573', message: '请先登录' })
       }
-
-      // if (this.userId) {
-      //   if (this.queryBtn === 0) {
-      //     this.$notify({ color: '#fff', background: '#b99573', message: '请先搜索文件后上传' })
-      //   } else if (this.queryBtn === 1) {
-      //     console.log('点击了地方版一键上传this.updateDatas', this.updateDatas)
-      //     this.$refs.uploadFile.updateOrDelete(this.updateDatas, '综合检索')
-      //   } else if (this.queryBtn === 2 && this.commonFlag) {
-      //     this.$refs.uploadFile.updateOrDelete(this.updateCommonDatas, '行业检索通用规定')
-      //   } else if (this.queryBtn === 2 && this.industryFlag) {
-      //     this.$refs.uploadFile.updateOrDelete(this.updateIndustryDatas, '行业检索专属规定')
-      //   } else if (this.queryBtn === 3 && this.radio === '1') {
-      //     this.$refs.uploadFile.updateOrDelete(this.updateDatas, '税收优惠项目')
-      //   } else if (this.queryBtn === 3 && this.radio === '2') {
-      //     this.$refs.uploadFile.updateOrDelete(this.updateDatas, '税收优惠税种')
-      //   } else if (this.queryBtn === 3 && this.radio === '3' && this.commonFlag) {
-      //     this.$refs.uploadFile.updateOrDelete(this.updateCommonDatas, '税收优惠行业通用')
-      //   } else if (this.queryBtn === 3 && this.radio === '3' && this.industryFlag) {
-      //     this.$refs.uploadFile.updateOrDelete(this.updateIndustryDatas, '税收优惠行业专属')
-      //   } else if (this.queryBtn === 4 && this.commonFlag) {
-      //     console.log('222this.updateCommonDatas=>', this.updateCommonDatas)
-      //     this.$refs.uploadFile.updateOrDelete(this.updateCommonDatas, '条约检索通用规定')
-      //   } else if (this.queryBtn === 4 && this.industryFlag) {
-      //     this.$refs.uploadFile.updateOrDelete(this.updateIndustryDatas, '条约检索专属规定')
-      //   } else if (this.queryBtn === 5) {
-      //     this.$refs.uploadFile.updateOrDelete(this.updateDatas, '进出口税收检索')
-      //   }
-      // } else {
-      //   this.$notify({ color: '#fff', background: '#b99573', message: '请先登录' })
-      // }
     },
     // 点击选择上传
     chooseUpdateOrDelete() {
@@ -1900,6 +1861,152 @@ export default {
       this.getData(this.tagid, this.stime, this.etime, this.searchText)
     },
     changePage5(num) {
+      this.$nextTick(() => {
+        let dom = document.getElementById('goToHere2')
+        dom.scrollIntoView()
+      })
+      if (this.queryBtn === 2 && this.commonFlag) {
+        this.currentCommonPage = num
+        this.getData2Common(this.tagid, this.stime, this.etime, this.searchText)
+      } else if (this.queryBtn === 2 && this.industryFlag) {
+        this.currentIndustryPage = num
+        this.getData2Industry(this.tagid, this.stime, this.etime, this.searchText)
+      } else if (this.queryBtn === 3 && this.radio === '1') {
+        this.currentPage5 = num
+        this.getDataRadio1(this.tagid, this.stime, this.etime, this.searchText)
+      } else if (this.queryBtn === 3 && this.radio === '2') {
+        this.currentPage5 = num
+        this.getDataRadio2(this.tagid, this.stime, this.etime, this.searchText)
+      } else if (this.queryBtn === 3 && this.radio === '3' && this.commonFlag) {
+        this.currentCommonPage = num
+        this.getDataRadio3CommonFiles(this.tagid, this.stime, this.etime, this.searchText)
+      } else if (this.queryBtn === 3 && this.radio === '3' && this.industryFlag) {
+        this.currentIndustryPage = num
+        this.getDataRadio3IndustryFiles(this.tagid, this.stime, this.etime, this.searchText)
+      } else if (this.queryBtn === 4 && this.commonFlag) {
+        this.currentCommonPage = num
+        this.getData4Common(this.tagid, this.stime, this.etime, this.searchText)
+      } else if (this.queryBtn === 4 && this.industryFlag) {
+        this.currentIndustryPage = num
+        this.getData4Industry(this.tagid, this.stime, this.etime, this.searchText)
+      } else if (this.queryBtn === 5) {
+        this.currentPage5 = num
+        this.getData5(this.tagid, this.stime, this.etime, this.searchText)
+      }
+    },
+    prevPage() {  // 上一页
+      if (this.currentPage == 1) return
+      this.currentPage--
+      this.$nextTick(() => {
+        let dom = document.getElementById('goToHere2')
+        dom.scrollIntoView()
+      })
+      this.getData(this.tagid, this.stime, this.etime, this.searchText)
+    },
+    nextPage() {  // 下一页
+      if (this.currentPage == this.total)return
+      this.currentPage++
+      this.$nextTick(() => {
+        let dom = document.getElementById('goToHere2')
+        dom.scrollIntoView()
+      })
+      this.getData(this.tagid, this.stime, this.etime, this.searchText)
+    },
+    jumpToPageSize(num) {  // 跳转到多少页
+      this.currentPage = num
+      this.$nextTick(() => {
+        let dom = document.getElementById('goToHere2')
+        dom.scrollIntoView()
+      })
+      this.getData(this.tagid, this.stime, this.etime, this.searchText)
+    },
+    prevPage5() {  // 上一页
+      this.$nextTick(() => {
+        let dom = document.getElementById('goToHere2')
+        dom.scrollIntoView()
+      })
+      if (this.queryBtn === 2 && this.commonFlag) {
+        if (this.currentCommonPage == 1) return
+        this.currentCommonPage--
+        this.getData2Common(this.tagid, this.stime, this.etime, this.searchText)
+      } else if (this.queryBtn === 2 && this.industryFlag) {
+        if (this.currentIndustryPage == 1) return
+        this.currentIndustryPage--
+        this.getData2Industry(this.tagid, this.stime, this.etime, this.searchText)
+      } else if (this.queryBtn === 3 && this.radio === '1') {
+        if (this.currentPage5 == 1) return
+        this.currentPage5--
+        this.getDataRadio1(this.tagid, this.stime, this.etime, this.searchText)
+      } else if (this.queryBtn === 3 && this.radio === '2') {
+        if (this.currentPage5 == 1) return
+        this.currentPage5--
+        this.getDataRadio2(this.tagid, this.stime, this.etime, this.searchText)
+      } else if (this.queryBtn === 3 && this.radio === '3' && this.commonFlag) {
+        if (this.currentCommonPage == 1) return
+        this.currentCommonPage--
+        this.getDataRadio3CommonFiles(this.tagid, this.stime, this.etime, this.searchText)
+      } else if (this.queryBtn === 3 && this.radio === '3' && this.industryFlag) {
+        if (this.currentIndustryPage == 1) return
+        this.currentIndustryPage--
+        this.getDataRadio3IndustryFiles(this.tagid, this.stime, this.etime, this.searchText)
+      } else if (this.queryBtn === 4 && this.commonFlag) {
+        if (this.currentCommonPage == 1) return
+        this.currentCommonPage--
+        this.getData4Common(this.tagid, this.stime, this.etime, this.searchText)
+      } else if (this.queryBtn === 4 && this.industryFlag) {
+        if (this.currentIndustryPage == 1) return
+        this.currentIndustryPage--
+        this.getData4Industry(this.tagid, this.stime, this.etime, this.searchText)
+      } else if (this.queryBtn === 5) {
+        if (this.currentPage5 == 1) return
+        this.currentPage5--
+        this.getData5(this.tagid, this.stime, this.etime, this.searchText)
+      }
+    },
+    nextPage5() {  // 下一页
+      this.$nextTick(() => {
+        let dom = document.getElementById('goToHere2')
+        dom.scrollIntoView()
+      })
+      if (this.queryBtn === 2 && this.commonFlag) {
+        if (this.currentCommonPage == this.commonTotal5)return
+        this.currentCommonPage++
+        this.getData2Common(this.tagid, this.stime, this.etime, this.searchText)
+      } else if (this.queryBtn === 2 && this.industryFlag) {
+        if (this.currentIndustryPage == this.industryTotal5)return
+        this.currentIndustryPage++
+        this.getData2Industry(this.tagid, this.stime, this.etime, this.searchText)
+      } else if (this.queryBtn === 3 && this.radio === '1') {
+        if (this.currentPage5 == this.total5)return
+        this.currentPage5++
+        this.getDataRadio1(this.tagid, this.stime, this.etime, this.searchText)
+      } else if (this.queryBtn === 3 && this.radio === '2') {
+        if (this.currentPage5 == this.total5)return
+        this.currentPage5++
+        this.getDataRadio2(this.tagid, this.stime, this.etime, this.searchText)
+      } else if (this.queryBtn === 3 && this.radio === '3' && this.commonFlag) {
+        if (this.currentCommonPage == this.commonTotal5)return
+        this.currentCommonPage++
+        this.getDataRadio3CommonFiles(this.tagid, this.stime, this.etime, this.searchText)
+      } else if (this.queryBtn === 3 && this.radio === '3' && this.industryFlag) {
+        if (this.currentIndustryPage == this.industryTotal5)return
+        this.currentIndustryPage++
+        this.getDataRadio3IndustryFiles(this.tagid, this.stime, this.etime, this.searchText)
+      } else if (this.queryBtn === 4 && this.commonFlag) {
+        if (this.currentCommonPage == this.commonTotal5)return
+        this.currentCommonPage++
+        this.getData4Common(this.tagid, this.stime, this.etime, this.searchText)
+      } else if (this.queryBtn === 4 && this.industryFlag) {
+        if (this.currentIndustryPage == this.industryTotal5)return
+        this.currentIndustryPage++
+        this.getData4Industry(this.tagid, this.stime, this.etime, this.searchText)
+      } else if (this.queryBtn === 5) {
+        if (this.currentPage5 == this.total5)return
+        this.currentPage5++
+        this.getData5(this.tagid, this.stime, this.etime, this.searchText)
+      }
+    },
+    jumpToPageSize5(num) {  // 跳转到多少页
       this.$nextTick(() => {
         let dom = document.getElementById('goToHere2')
         dom.scrollIntoView()

@@ -233,42 +233,7 @@
         </div>
       </div>
     </div>
-    <!-- 弹框详情 -->
-    <!-- <van-popup v-model="showDetailPopup" position="right" :style="{ height: '100%', width: '100%' }">
-      <div class="fileElements">
-        <div class="docContent" id="moreMerchant">
-          <van-collapse v-model="activeNames">
-            <van-collapse-item title="文件要素" name="1">
-              <div class="elements topLine">
-                <div class="title">文件要素</div>
-                <div class="content">内容</div>
-              </div>
-              <div class="elements" v-for="(item, index) in headers" :key="index">
-                <div class="title" v-html="item.t"></div>
-                <div class="content" v-html="item.v" @click="open"></div>
-              </div>
-            </van-collapse-item>
-          </van-collapse>
-          <div class="detail defaultFont" v-html="value" style="background: #fff; padding: 10px;" @click="open"></div>
-          <div v-if="!userId" class="loginBtn"><van-button type="primary" @click="login">请登录查看全文</van-button></div>
-        </div>
-      </div>
-      <van-tabbar :border="false">
-        <div v-if="activeName === 'c'" class="backStyle" style="background-color: #fff; diaplay: flex;justify-content: space-around;align-items: center;">
-          <van-button :disabled="lastFlag" style="height: 100%;width: 3.2rem;border-radius: 30px;height: 40px;" type="info" @click="backToLastFire">返回</van-button>
-          <van-button style="height: 100%;width: 3.2rem;border-radius: 30px;height: 40px;" type="info" @click="backToMail">关闭</van-button>
-        </div>
-        <div v-else class="backStyle" style="background-color: #fff; diaplay: flex;align-items: center;">
-          <van-button :disabled="lastFlag" style="height: 100%;width: 2.6rem;border-radius: 30px;height: 40px;" type="info" @click="backToLastFire">返回</van-button>
-          <van-button style="height: 100%;width: 2.6rem;border-radius: 30px;height: 40px;" type="info" @click="backToMail">关闭</van-button>
-          <van-button style="height: 100%;width: 2.6rem;border-radius: 30px;height: 40px;" type="info" @click="uploadToSmartCloud">上传云端</van-button>
-        </div>
-      </van-tabbar>
-    </van-popup> -->
-    <!-- 登录 -->
-    <!-- <login ref="alertModel" @updateDoc="updateDoc"></login> -->
-
-    <!-- <van-overlay :showLoding="showLoding"></van-overlay> -->
+    
     <van-overlay :show="showLoding" @click="showLoding = false" z-index="9999" :custom-style="{backgroundColor: 'rgba(255, 255, 255, .8)'}">
       <div class="wrapper" @click.stop>
         <van-loading type="spinner" color="#1989fa"></van-loading>
@@ -281,9 +246,6 @@
 </template>
 
 <script>
-// import { base } from '@/utils/lib/util.js'
-// import Login from '@/components/common/login'
-// import VanOverlay from '@/components/common/vanOverlay'
 import FileSharing from '@/components/common/fileSharing'
 
 export default {
@@ -360,8 +322,6 @@ export default {
     }
   },
   components: {
-    // Login
-    // VanOverlay
     FileSharing
   },
   computed: {

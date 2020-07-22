@@ -61,20 +61,46 @@
       </div>
       <!-- 分页 -->
       <div v-if="lists.length > 0" class="pageBoxStyle">
-        <van-pagination v-model="currentPage" :page-count="total" mode="simple" @change="changePage" />
+        <Pagination 
+          :currentPage="currentPage" 
+          :total="total" 
+          :totalLists="totalLists"
+          @prevPage="prevPage" 
+          @nextPage="nextPage"
+          @jumpToPageSize="jumpToPageSize"
+          ></Pagination>
       </div>
       <!-- 底部导航 -->
       <tabbar @alertBars="alertBars" @alertCengji="alertCengji" @updateOrDelete="updateOrDelete" @chooseUpdateOrDelete="chooseUpdateOrDelete" :selectedID="selectedId"></tabbar> 
     </div>
     <div v-else class="noDatas">请先登录</div>
 
-    <van-overlay :showLoding="showLoding"></van-overlay>
-    <!-- <van-overlay :show="showLoding" @click="showLoding = false" z-index="9999" :custom-style="{background: 'transparent'}">
-      <div class="wrapper" @click.stop>
-        <van-loading type="spinner" color="#1989fa">文件加载中...</van-loading>
+    <!-- 点击一键删除弹出框 -->
+    <!-- <van-action-sheet
+      v-model="showActiveSheet"
+      :actions="actions"
+      cancel-text="取消"
+      close-on-click-action
+      @select="onSelect"
+      @cancel="onCancel"
+    /> -->
+    <van-action-sheet v-model="showActiveSheet" :round="false" get-container="body" >
+      <div style="height: 210px;">
+        <van-divider :style="{ fontSize: '17px', marginTop: '40px', marginBottom: '8px', position: 'relative' }">
+          请选择
+          <!-- <van-icon class="closeIcon" @click="onCancel" name="cross" color="#c8c9cc" /> -->
+          <van-icon class="closeIcon" @click="onCancel" name="close" color="#c8c9cc" />
+        </van-divider>
+        <div class="showActiveSheetContent">
+          <button v-for="(act, index) in actions" :key="index" class="item item-line" @click="onSelect(index)">
+            <img class="img" :src="act.img" />
+            <span class="word">{{ act.name }}</span>
+          </button>
+          <van-button block type="primary" color="#907456" @click="onCancel">取消</van-button>
+        </div>
       </div>
-    </van-overlay> -->
-
+    </van-action-sheet>
+    <van-overlay :showLoding="showLoding"></van-overlay>
   </div>
 </template>
 
@@ -86,10 +112,20 @@ import ClassificationRules from '@/components/common/classificationRules' // 法
 import RegulationsHierarchy from '@/components/common/regulationsHierarchy' // 法规层级
 import ListContent from '@/components/common/listContent'
 import VanOverlay from '@/components/common/vanOverlay'
+import Pagination from '@/components/common/pagination' // 分页
 
 export default {
   data() {
     return {
+      showActiveSheet: false, // 点击一键删除弹出框
+      // actions: [
+      //   { name: '删除此文件夹下的所有文件' },
+      //   { name: '删除全文废止（失效）文件' }
+      // ],
+      actions: [
+        { name: '删除此文件夹下的所有文件', img: require('../../assets/index/d1.png') },
+        { name: '删除全文废止（失效）文件', img: require('../../assets/index/d2.png') }
+      ],
       showLoding: false,
       selectedId: 'c',
       chooseDir: '全部文件夹',
@@ -134,7 +170,8 @@ export default {
     ClassificationRules,
     RegulationsHierarchy,
     ListContent,
-    VanOverlay
+    VanOverlay,
+    Pagination
   },
   computed: {
     userId() {
@@ -144,7 +181,6 @@ export default {
       return this.$store.state.fixedFolder.fixedFolderArr
     }
   },
-  mounted() {},
   methods: {
     alertPopup() {
       this.showSearchPopup = true
@@ -182,6 +218,10 @@ export default {
       this.$refs.searchBox.keyword = ''
       this.$refs.searchBox.startAndEndTimeOne = ''
       this.$refs.searchBox.startAndEndTimeTwo = ''
+
+      this.stime = ''
+      this.etime = ''
+      this.searchText = ''
 
       // 清除数据
       this.backStatus()
@@ -249,7 +289,12 @@ export default {
 
       // console.log('argsargsparams666666666666', args)
       this.$http.reqGetUploadFiles(args).then(response => {
-        // console.log('获取云端文件==============>>>>>', response)
+        console.log('获取云端文件==============>>>>>', response)
+
+        if (response.tbls[0].items === null && response.tbls[0].classifytag.length === 0) {
+          this.$refs.classification.alertBar2()
+        }
+
         this.showLoding = false
         this.lists = response.tbls[0].items !== null ? response.tbls[0].items : []
         this.t1 =  response.tbls[0].divisiontag.length !== 0 && response.tbls[0].divisiontag.t1.length > 0 ? response.tbls[0].divisiontag.t1 : []
@@ -349,16 +394,11 @@ export default {
       this.clickConfirmBtn = false
       this.isFilter = true
       this.tagpc = tagpc
-      // if (tagpc.length > 0) {
-      //   this.tagpc = tagpc
-      // } else {
-      //   this.tagpc = this.showAllTagpc
-      // }
+      console.log('this.tagpc', this.tagpc)
       this.currentPage = 1
       this.getData(this.tagid, this.stime, this.etime, this.searchText)
     },
     showGetData(data) {
-      // console.log('data智慧云端===>', data)
       this.showData = data
       this.tagid = data.tagid
       this.getData(this.tagid, data.stime, data.etime, data.searchText)
@@ -368,32 +408,55 @@ export default {
     },
     // 选择时间
     selectTime(time) {
-      this.SearchTimes = 2
+      // this.SearchTimes = 2
       this.stime = time.stime
       this.etime = time.etime
       this.currentPage = 1
-      this.getData(this.tagid, this.stime, this.etime, this.searchText)
+      
+      // this.getData(this.tagid, this.stime, this.etime, this.searchText)
+      if (this.folderid) {
+        this.SearchTimes = 2
+        this.getData(this.tagid, this.stime, this.etime, this.searchText)
+      }
+
       // 清除数据
       this.backStatus()
       this.$refs.listCont.toggle([])
     },
     // 搜索按钮
     searchKeyWord(keyword) {
-      this.SearchTimes = 2
+      // this.SearchTimes = 2
       this.searchText = keyword
       this.currentPage = 1
-      this.getData(this.tagid, this.stime, this.etime, this.searchText)
+      // if (!(this.stime || this.etime || this.searchText)) {
+      //   this.$refs.classification.alertBar2()
+      // }
+      // if (this.folderid && this.searchText) {
+      //   this.SearchTimes = 2
+      //   this.getData(this.tagid, this.stime, this.etime, this.searchText)
+      // }
+      if (this.folderid) {
+        this.SearchTimes = 2
+        this.getData(this.tagid, this.stime, this.etime, this.searchText)
+      }
       // 清除数据
       this.backStatus()
       this.$refs.listCont.toggle([])
     },
     // 清除时间按钮
     clearTime() {
-      this.SearchTimes = 2
+      // this.SearchTimes = 2
       this.stime = ''
       this.etime = ''
       this.currentPage = 1
-      this.getData(this.tagid, this.stime, this.etime, this.searchText)
+      // if (!this.stime && !this.etime && !this.searchText) {
+      //   this.$refs.classification.alertBar2()
+      // }
+      // this.getData(this.tagid, this.stime, this.etime, this.searchText)
+      if (this.folderid) {
+        this.SearchTimes = 2
+        this.getData(this.tagid, this.stime, this.etime, this.searchText)
+      }
       // 清除数据
       this.backStatus()
       this.$refs.listCont.toggle([])
@@ -406,6 +469,7 @@ export default {
     },
     // 改变页码
     changePage(num) {
+      console.log('num==>>', num)
       this.currentPage = num
       this.$nextTick(() => {
         let dom = document.getElementById('goToHere1')
@@ -413,63 +477,71 @@ export default {
       })
       this.getData(this.tagid, this.stime, this.etime, this.searchText)
     },
+    prevPage() {  // 上一页
+      if (this.currentPage == 1) return
+      this.currentPage--
+      this.$nextTick(() => {
+        let dom = document.getElementById('goToHere1')
+        dom.scrollIntoView()
+      })
+      this.getData(this.tagid, this.stime, this.etime, this.searchText)
+    },
+    nextPage() {  // 下一页
+      if (this.currentPage == this.total)return
+      this.currentPage++
+      this.$nextTick(() => {
+        let dom = document.getElementById('goToHere1')
+        dom.scrollIntoView()
+      })
+      this.getData(this.tagid, this.stime, this.etime, this.searchText)
+    },
+    jumpToPageSize(num) {  // 跳转到多少页
+      this.currentPage = num
+      this.getData(this.tagid, this.stime, this.etime, this.searchText)
+    },
     // 点击弹出搜索导航框
     alertBars() {
       if (this.flag) {
         this.$refs.classification.alertBars()
       } else if (!this.flag) {
-        this.$notify({ color: '#fff', background: '#b99573', message: '请先搜索文件后使用' })
+        this.$notify({ color: '#fff', background: '#b99573', message: '请先选择文件夹后使用' })
       }
-
-      // if (this.flag && this.lists.length > 0) {
-      //   this.$refs.classification.alertBars()
-      // } else if (!this.flag) {
-      //   this.$notify({ color: '#fff',
-      //           background: '#b99573', message: '请先搜索文件后使用' })
-      // }
-      // if (this.flag && this.lists.length === 0) {
-      //   this.$refs.classification.alertBar4()
-      // }
     },
     // 点击弹出法规层级框
     alertCengji() {
-      // if (this.flag && this.lists.length === 0) {
-      //   this.$refs.regulations.clearData()
-      // }
-      // if (this.flag && this.lists.length > 0) {
       if (this.deleteAll) {
         this.$refs.regulations.clearData()
       }
       if (this.flag && !this.deleteAll) {
         this.$refs.regulations.processData(this.proAndCityData)
       } else if (!this.flag) {
-        this.$notify({ color: '#fff',
-                background: '#b99573', message: '请先搜索文件后使用' })
+        this.$notify({ color: '#fff', background: '#b99573', message: '请先选择文件夹后使用' })
       }
     },
-    // 点击智慧云端的一键删除
-    updateOrDelete() {
-      // console.log('this.lists', this.lists)
-      if (!this.folderid) {
-        this.$notify({ color: '#fff',
-                background: '#b99573', message: '请先选择文件夹' })
-      } else {
+    // 取消
+    onCancel() {
+      this.showActiveSheet = false
+    },
+    // 点击了智慧云端一键删除
+    // onSelect(name, index) {
+    onSelect(index) {
+      if (index === 0) {  // 删除当前文件夹下得所有文件
         if (this.lists.length > 0) {
           this.$dialog.confirm({
             title: '提示',
             message: `您确定删除此文件夹下的所有文件吗?`,
           })
             .then(() => {
-              // console.log('点击智慧云端的一键删除', this.folderid)
               this.$http.reqRemoveFilesByFolderId(this.folderid).then(response => {
-                // console.log('response===>', response)
                 if (response.rtncode === 1) {
                   if (response.rltcode === 1) {
                     this.lists = []
-                    this.$notify({ color: '#fff',
-                background: '#b99573', message: '删除成功' })
+                    this.getData()
+                    this.$refs.classification.alertBar2()
+                    this.$notify({ color: '#fff', background: '#b99573', message: '删除成功' })
                     this.backStatus()
                     this.deleteAll = true
+                    this.showActiveSheet = false
                   }
                 }
               })
@@ -478,9 +550,113 @@ export default {
               // on cancel
             })
         } else {
-          this.$notify({ color: '#fff',
-                background: '#b99573', message: '当前文件夹下无文件' })
+          this.$notify({ color: '#fff', background: '#b99573', message: '当前文件夹下无文件' })
+          this.showActiveSheet = false
         }
+      } else if (index === 1) {  // 删除所有全文废止(失效)文件
+        if (this.lists.length === 0) {
+          this.$notify({ color: '#fff', background: '#b99573', message: '当前文件夹下无全文废止(失效)文件' })
+          this.backStatus()
+          this.showActiveSheet = false
+        } else {
+          this.$dialog.confirm({
+              title: '提示',
+              message: `您确定删除此文件夹下的所有全文废止(失效)文件吗?`,
+            })
+              .then(() => {
+                this.$http.reqRemoveAbolitionFilesByFolderId(this.folderid).then(response => {
+                  if (response.rtncode === 1) {
+                    if (response.rltcode === 1) {
+                      if (this.tagid || this.stime || this.etime || this.searchText) {
+                        this.getData(this.tagid, this.stime, this.etime, this.searchText)
+                      } else {
+                        this.getData()
+                        this.$refs.classification.alertBar2()
+                      }
+                      this.$notify({ color: '#fff', background: '#b99573', message: '删除成功' })
+                      this.backStatus()
+                      this.showActiveSheet = false
+                    }
+                  }
+                })
+              })
+              .catch(() => {
+                // on cancel
+              })
+        }
+      }
+    },
+    // 点击智慧云端的一键删除
+    updateOrDelete() {
+      if (!this.folderid) {
+        this.$notify({ color: '#fff', background: '#b99573', message: '请先选择文件夹' })
+        this.showActiveSheet = false
+      } else {
+        this.showActiveSheet = true
+      }
+    },
+    // 删除所有文件
+    deleteThisAllFiles() {
+      if (this.lists.length > 0) {
+        this.$dialog.confirm({
+          title: '提示',
+          message: `您确定删除此文件夹下的所有文件吗?`,
+        })
+          .then(() => {
+            this.$http.reqRemoveFilesByFolderId(this.folderid).then(response => {
+              // console.log('response===>', response)
+              if (response.rtncode === 1) {
+                if (response.rltcode === 1) {
+                  this.lists = []
+                  this.getData()
+                  this.$refs.classification.alertBar2()
+                  this.showActiveSheet = false
+                  this.$notify({ color: '#fff', background: '#b99573', message: '删除成功' })
+                  this.backStatus()
+                  this.deleteAll = true
+                }
+              }
+            })
+          })
+          .catch(() => {
+            // on cancel
+          })
+      } else {
+        this.$notify({ color: '#fff', background: '#b99573', message: '当前文件夹下无文件' })
+        this.showActiveSheet = false
+      }
+    },
+    // 删除全文废止(失效)文件
+    deleteAbolish() {
+      if (this.lists.length === 0) {
+        this.$notify({ color: '#fff', background: '#b99573', message: '当前文件夹下无全文废止(失效)文件' })
+        this.backStatus()
+        this.showActiveSheet = false
+      } else {
+        this.$dialog.confirm({
+            title: '提示',
+            message: `您确定删除此文件夹下的所有全文废止(失效)文件吗?`,
+          })
+            .then(() => {
+              this.$http.reqRemoveAbolitionFilesByFolderId(this.folderid).then(response => {
+                if (response.rtncode === 1) {
+                  if (response.rltcode === 1) {
+                    if (this.tagid || this.stime || this.etime || this.searchText) {
+                      this.getData(this.tagid, this.stime, this.etime, this.searchText)
+                    } else {
+                      this.getData()
+                      this.$refs.classification.alertBar2()
+                    }
+                    this.showActiveSheet = false
+                    this.$notify({ color: '#fff', background: '#b99573', message: '删除成功' })
+                    this.backStatus()
+                  }
+                }
+              })
+            })
+            .catch(() => {
+              // on cancel
+            })
       }
     },
     // 点击智慧云端的选择删除
@@ -516,8 +692,13 @@ export default {
                 this.$http.reqRemoveFilesByList(this.folderid, list).then(response => {
                   if (response.rtncode === 1) {
                     if (response.rltcode === 1) {
-                      this.getData()
-                      this.$refs.classification.alertBar2()
+                      if (this.tagid || this.stime || this.etime || this.searchText) {
+                        this.getData(this.tagid, this.stime, this.etime, this.searchText)
+                      } else {
+                        this.getData()
+                        this.$refs.classification.alertBar2()
+                      }
+
                       this.$notify({ color: '#fff', background: '#b99573', message: '删除成功' })
                       this.backStatus()
                     }
@@ -595,18 +776,6 @@ export default {
   .marginStyle {
     margin-top: 10px;
   }
-  .bread {
-    font-size: 14px;
-    font-weight: bold;
-    ul li a {
-      text-decoration: none;
-      color: blue;
-    }
-    .breadNav::before {
-      content: '/';
-      margin-right: 4px;
-    }
-  }
   .file {
     font-size: 14px;
     .fileList {
@@ -637,11 +806,68 @@ export default {
   .van-nav-bar__left {
     padding: 0;
   }
+  // /deep/ .van-action-sheet__item {
+  //   font-size: 0.38rem;
+  // }
+  // /deep/ .van-action-sheet__cancel {
+  //   font-size: 0.38rem;
+  //   background: linear-gradient(#907456,#715641);
+  //   color: #fff;
+  // }
 }
-// #resultTitle /deep/ .van-ellipsis{}
 </style>
-<style>
+<style lang="less">
+.van-dialog__message {
+  text-align: left;
+}
+.van-dialog__message {
+  text-align: left;
+}
 .van-nav-bar__title {
   font-weight: 700;
+}
+.van-action-sheet__cancel {
+  font-size: 0.4rem;
+  background: #907456;
+  color: #fff;
+}
+.closeIcon {
+  position: absolute;
+  font-size: 0.58667rem; 
+  right: 0.42667rem;
+  top: -20px;
+}
+.showActiveSheetContent {
+  padding: 0 20px 20px;
+  box-sizing: border-box;
+  .item {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 1.33333rem;
+    padding: 0;
+    font-size: 0.36rem;
+    line-height: 0.53333rem;
+    background-color: #fff;
+    border: none;
+    cursor: pointer;
+    .word {
+      font-size: 0.36rem;
+      line-height: 0.53333rem;
+    }
+    .img {
+      width: 20px;
+      height: 20px;
+      margin-right: 8px;
+    }
+    &:active {
+      background-color: #f2f3f5;
+    }
+  }
+  .item-line:nth-child(odd) {
+    // border-bottom-width: 0.02667rem;
+    border-bottom: 1px solid #ebedf0;
+  }
 }
 </style>
